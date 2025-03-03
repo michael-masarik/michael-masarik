@@ -1,3 +1,6 @@
+//Main script file for my site
+//Started on 3/3/2025
+
 // Link Button function
 function linkButton(url, target = "_blank") {
     let linkElement = document.createElement("a");
