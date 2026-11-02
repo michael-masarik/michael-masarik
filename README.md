@@ -1,13 +1,32 @@
-# Michael Masarik
+# Hi, I'm Michael Masarik 👋
 
-My personal site, built with Blueprint:
+Self-taught developer in northeast Wisconsin. I build practical tools, run a family library, and publish public domain books.
 
-**A personal site that looks like an engineering drawing.**<br>
-Fill in one file about yourself, deploy, done.
+## What I'm up to
 
-[**Live demo**](https://flaviaouyang.github.io/blueprint) ·
-[**Use this template**](https://github.com/new?template_name=blueprint&template_owner=flaviaouyang) ·
+- 📚 **[Plumfield Library](https://plumfieldlibrary.com)**: a non-profit family library serving ~100 families with ~10,000 books across three locations
+- 🖨️ **[Plumfield Press](https://plumfieldpress)**: a small press producing quality editions of public domain books, with print-on-demand through Lulu
+- 🛠️ Building the software that keeps both running: catalogs, storefronts, and the glue in between
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fflaviaouyang%2Fblueprint&project-name=my-site&repository-name=my-site)
+## Tech I use
 
-Huge thanks to [Flavia Ouyang](https://github.com/flaviaouyang) for this amazing template!
+**Languages:** Python · TypeScript · JavaScript · Go · SQL
+**Frontend:** React · Vite · Next.js · Tailwind CSS
+**Backend:** FastAPI · Go · Notion API as a lightweight backend
+**Data:** SQLite · Turso
+**Infra:** Cloudflare (Pages, Tunnels, Zero Trust) · Vercel · Tailscale
+**Commerce:** Shopify · Lulu print-on-demand
+**Also dabbled in:** PHP · Swift
+
+## How I like to build
+
+Pragmatic over fashionable. Pick the right tool for the job, keep the stack small, and ship things that real people actually use.
+
+## Off the clock
+
+🌱 Horticulture and plant biology
+🌌 Physics, especially general relativity, objective-collapse approaches to quantum mechanics, and chaos theory
+
+## Get in touch
+
+- 🌐 [https://michaelmasarik.com](https://michaelmasarik.com)
