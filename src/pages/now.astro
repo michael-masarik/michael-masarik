@@ -1,0 +1,27 @@
+---
+// Now: what you're doing now, from content/now.mdx.
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Plate from '../components/Plate.astro';
+import { formatDate } from '../lib/posts';
+import { getProfile } from '../lib/profile';
+import { inline, plain } from '../lib/markdown';
+
+const { pages } = await getProfile();
+const now = await getEntry('now', 'now');
+if (!now) throw new Error(
+    "content/now.mdx wasn't loaded. Check that it exists and that the terminal shows no validation error for it; if you just fixed one, restart `bun run dev`.",
+  );
+const { Content } = await render(now);
+const { updatedAt } = now.data;
+---
+<Base title="Now" description={plain(pages.now)} block={{ heading: 'Now', revised: updatedAt }}>
+  <Plate>
+    <h1 class="page-title">Now</h1>
+    <p class="lede" set:html={inline(pages.now)} />
+    <div class="post-meta label">
+      Updated <time datetime={updatedAt.toISOString().slice(0, 10)}>{formatDate(updatedAt)}</time>
+    </div>
+  </Plate>
+  <div class="prose"><Content /></div>
+</Base>

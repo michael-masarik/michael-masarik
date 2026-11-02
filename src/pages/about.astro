@@ -1,0 +1,39 @@
+---
+// About, experience tab: each company with its summary and roles, from content/profile.yaml.
+// A table of contents lists the companies for quick navigation.
+import Base from '../layouts/Base.astro';
+import Plate from '../components/Plate.astro';
+import Tabs from '../components/Tabs.astro';
+import Toc from '../components/Toc.astro';
+import { formatSpan, getProfile } from '../lib/profile';
+import { ABOUT_TABS } from '../lib/sections';
+import { slugify } from '../lib/paths';
+import { inline, plain } from '../lib/markdown';
+
+const { pages, experience } = await getProfile();
+const companies = experience.map((job) => ({ ...job, slug: slugify(job.org) }));
+---
+<Base title="Experience" description={plain(pages.about)} block={{ heading: 'Experience', section: 'About' }}>
+  <Tabs label="About" tabs={ABOUT_TABS} />
+  <Plate>
+    <h1 class="page-title">Experience</h1>
+    <p class="lede" set:html={inline(pages.about)} />
+  </Plate>
+
+  <Toc headings={companies.map(({ org, slug }) => ({ depth: 2, slug, text: org }))} />
+
+  <div class="prose">
+    {companies.map(({ org, url, slug, summary, roles }) => (
+      <section class="entry">
+        <h2 id={slug}>{url ? <a href={url}>{org}</a> : org}</h2>
+        <p set:html={inline(summary)} />
+        {roles.map(({ title, start, end, highlights }) => (
+          <div class="role">
+            <div class="role-head"><h3>{title}</h3><span class="label">{formatSpan(start, end)}</span></div>
+            {highlights.length > 0 && <ul>{highlights.map((text) => <li set:html={inline(text)} />)}</ul>}
+          </div>
+        ))}
+      </section>
+    ))}
+  </div>
+</Base>

@@ -1,0 +1,288 @@
+/*
+  Draft Paper components and page shell. Every value comes from tokens.css.
+*/
+
+*, *::before, *::after { box-sizing: border-box; }
+::selection { background: var(--ink); color: var(--paper); }
+/* Reserve the scrollbar's space on every page, so the centred sheet doesn't shift
+   between pages that scroll and pages that don't. */
+html { scroll-padding-top: var(--space-8); scrollbar-gutter: stable; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--weight-regular) var(--text-base) / var(--leading-body) var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-decoration-thickness: var(--hairline);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.15s;
+}
+a:hover { text-decoration-color: var(--ink); }
+:focus-visible { outline: var(--hairline) solid var(--ink); outline-offset: 3px; }
+p { margin: 0 0 var(--space-5); }
+img { max-width: 100%; height: auto; }
+.label {
+  font: var(--text-label) / var(--leading-label) var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.skip {
+  position: absolute; left: var(--space-4); top: -3rem;
+  padding: var(--space-2) var(--space-3); background: var(--ink); color: var(--paper);
+}
+.skip:focus { top: var(--space-4); }
+
+.grid-paper {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:
+    calc(var(--cell) * 5) calc(var(--cell) * 5),
+    calc(var(--cell) * 5) calc(var(--cell) * 5),
+    var(--cell) var(--cell),
+    var(--cell) var(--cell);
+  background-position: -1px -1px;
+}
+
+/* Sheet: the framed drawing, with registration marks and a dimension line */
+/* The sheet always fills at least the viewport, so short pages still read as a whole
+   drawing, with the title block at the bottom: each level grows to fill its parent. */
+body { min-height: 100svh; display: flex; flex-direction: column; }
+.sheet-wrap {
+  flex: 1; display: flex; flex-direction: column; width: 100%;
+  max-width: calc(var(--sheet) + 2 * var(--gutter)); margin: var(--space-10) auto var(--space-12); padding: 0 var(--gutter);
+}
+/* Snap the drawing's width so the sheet's content column is a whole number of grid
+   cells plus the closing hairline. Grid plates then end on a full column. */
+.sheet-wrap > * {
+  --frame: calc(2 * var(--hairline) + 2 * var(--sheet-pad) + var(--hairline));
+  align-self: center;
+  width: calc(round(down, 100% - var(--frame), var(--cell)) + var(--frame));
+}
+.dimension { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); }
+.dimension::before, .dimension::after {
+  content: ''; flex: 1; height: 7px; margin-top: 6px;
+  border-top: var(--hairline) solid var(--line);
+}
+.dimension::before { border-left: var(--hairline) solid var(--line); }
+.dimension::after { border-right: var(--hairline) solid var(--line); }
+.sheet { flex: 1; display: flex; flex-direction: column; position: relative; border: var(--hairline) solid var(--ink); }
+.tick { position: absolute; width: var(--tick); height: var(--tick); }
+/* Arms are centred on the frame's own hairline, which sits outside the padding box */
+.tick::before, .tick::after { content: ''; position: absolute; background: var(--ink); }
+.tick::before { left: calc((var(--tick) - var(--hairline)) / 2); top: 0; width: var(--hairline); height: 100%; }
+.tick::after { top: calc((var(--tick) - var(--hairline)) / 2); left: 0; height: var(--hairline); width: 100%; }
+.tick.tl { top: calc((var(--tick) + var(--hairline)) / -2); left: calc((var(--tick) + var(--hairline)) / -2); }
+.tick.tr { top: calc((var(--tick) + var(--hairline)) / -2); right: calc((var(--tick) + var(--hairline)) / -2); }
+.tick.bl { bottom: calc((var(--tick) + var(--hairline)) / -2); left: calc((var(--tick) + var(--hairline)) / -2); }
+.tick.br { bottom: calc((var(--tick) + var(--hairline)) / -2); right: calc((var(--tick) + var(--hairline)) / -2); }
+.sheet-body { flex: 1; display: flex; flex-direction: column; padding: var(--sheet-pad); }
+.sheet-body > main { flex: 1; }
+
+/* Header */
+.site-nav {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
+  padding: var(--space-4) var(--sheet-pad);
+  border-bottom: var(--hairline) solid var(--ink);
+  font-size: var(--text-nav); font-weight: var(--weight-medium);
+}
+.site-nav ul { display: flex; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+@media (min-width: 640px) { .site-nav ul { gap: var(--space-5); } }
+.site-nav a { text-decoration: none; }
+.site-nav li a[aria-current] { text-decoration: underline; text-decoration-color: var(--ink); }
+.mark { font-size: var(--text-h2); line-height: 1; letter-spacing: -0.04em; }
+
+/* Plate: a grid panel behind a page header. Hover fills a cell and reads its coordinate. */
+.plate { position: relative; overflow: hidden; margin: 0 0 var(--space-8); padding: var(--space-8) var(--space-6) var(--space-7); border: var(--hairline) solid var(--line); }
+.plate-coords { position: absolute; top: var(--space-2); right: var(--space-3); }
+.plate-cell {
+  position: absolute; top: 0; left: 0; width: var(--cell); height: var(--cell);
+  background: var(--ink); opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.plate:hover .plate-cell { opacity: 0.18; }
+@media (prefers-reduced-motion: reduce) { .plate-cell { transition: none; } }
+.page-title { margin: 0 0 var(--space-4); font-size: var(--text-h1); font-weight: var(--weight-medium); letter-spacing: var(--tracking-title); line-height: var(--leading-title); }
+.post-title { font-size: var(--text-title); }
+.lede { margin: 0; font-size: var(--text-lede); }
+.post-meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin-top: var(--space-5); }
+.pill {
+  display: inline-block; margin-bottom: var(--space-5); padding: 0.15rem var(--space-3);
+  border: var(--hairline) solid var(--ink); border-radius: var(--radius-pill);
+  font-size: var(--text-sm); font-weight: var(--weight-medium);
+}
+
+/* Linked cards; the arrow tilts on hover, carried over from the current site */
+.cards { margin: var(--space-8) 0; }
+.card {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  margin: 0 0 var(--space-3); padding: var(--space-4);
+  border: var(--hairline) solid var(--line); text-decoration: none; font-weight: var(--weight-medium);
+  transition: border-color 0.15s;
+}
+.card:hover { border-color: var(--ink); }
+.card-left { display: flex; align-items: center; gap: var(--space-4); }
+.card time { flex: none; width: 3.5rem; }
+.card-summary { display: block; font-weight: var(--weight-regular); color: var(--prose); font-size: 0.9375rem; }
+.card > .label { flex: none; margin-left: auto; }
+
+/* Blog index: posts grouped by year. Tabs split a section into pages (About). */
+.year { margin: var(--space-8) 0 var(--space-3); }
+.tabs { display: flex; width: fit-content; margin: 0 0 var(--space-6); border: var(--hairline) solid var(--line); }
+.tabs a { padding: var(--space-2) var(--space-4); font-weight: var(--weight-medium); color: var(--ink-soft); text-decoration: none; }
+.tabs a + a { border-left: var(--hairline) solid var(--line); }
+.tabs a:hover, .tabs a[aria-current] { color: var(--ink); }
+.tabs a[aria-current] { box-shadow: inset 0 -2px 0 var(--ink); }
+
+.arrow { flex: none; width: 12px; height: 12px; transition: transform 0.3s; }
+.card:hover .arrow { transform: rotate(-12deg); }
+.avatar { flex: none; width: 56px; height: 56px; border-radius: 50%; border: var(--hairline) solid var(--line); }
+.duotone { filter: url(#duotone); }
+/* Dark screenshots (terminals, editors) are inverted first so they read like light code blocks */
+.duotone.dark-source { filter: invert(1) url(#duotone); }
+:root[data-paper='white'] .duotone { filter: url(#duotone-white); }
+:root[data-paper='white'] .duotone.dark-source { filter: invert(1) url(#duotone-white); }
+/* On blueprint, dark screenshots already match the paper, so they aren't inverted */
+:root[data-paper='blueprint'] .duotone,
+:root[data-paper='blueprint'] .duotone.dark-source { filter: url(#duotone-blueprint); }
+
+/* Easter egg: the title block's Material cell switches the paper (bone, white, blueprint) */
+.paper-toggle {
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+  cursor: pointer; text-decoration: underline dotted transparent; text-underline-offset: 0.25em;
+}
+.paper-toggle:hover { text-decoration-color: var(--ink-soft); }
+.balloon {
+  display: inline-grid; place-items: center; flex: none;
+  width: 1.6rem; height: 1.6rem; border: var(--hairline) solid var(--ink); border-radius: 50%;
+  font: var(--weight-regular) var(--text-label) var(--font-mono);
+}
+
+.contact { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin: var(--space-8) 0 0; padding: 0; list-style: none; color: var(--ink-soft); }
+.contact a { display: inline-flex; align-items: center; gap: var(--space-2); text-decoration: none; }
+.contact a:hover { color: var(--ink); }
+
+/* Title block: the drawing's information table, used as the footer.
+   Inner rules are the 1px grid gap showing --line, so no cell border doubles the frame. */
+.title-block {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--hairline); background: var(--line);
+  margin: var(--space-10) calc(-1 * var(--sheet-pad)) calc(-1 * var(--sheet-pad));
+  border-top: var(--hairline) solid var(--ink);
+}
+.title-block > div {
+  padding: var(--space-2) var(--space-3); line-height: var(--leading-label);
+  background: var(--paper); color: var(--ink);
+}
+.title-block .k { display: block; color: var(--ink-soft); font-size: var(--text-label-xs); }
+.title-block .wide { grid-column: 1 / -1; font: var(--weight-medium) 0.8125rem / var(--leading-label) var(--font-sans); letter-spacing: 0; text-transform: none; }
+.title-block .wide span { font-weight: var(--weight-regular); color: var(--ink-soft); }
+@media (min-width: 640px) {
+  .title-block { grid-template-columns: 2fr repeat(4, 1fr); margin-top: var(--space-12); }
+  .title-block .wide { grid-column: auto; grid-row: span 2; }
+}
+
+/* Prose */
+.prose { color: var(--prose); counter-reset: section figure; }
+.prose h2, .prose h3 { color: var(--ink); font-weight: var(--weight-medium); line-height: 1.35; }
+.prose h2 { margin: var(--space-12) 0 var(--space-4); font-size: var(--text-h2); letter-spacing: -0.02em; counter-increment: section; }
+.prose h2::before {
+  content: counter(section, decimal-leading-zero);
+  display: block; margin-bottom: var(--space-1);
+  font: var(--text-label) var(--font-mono); letter-spacing: var(--tracking-label); color: var(--ink-soft);
+}
+.prose h3 { margin: var(--space-8) 0 var(--space-3); font-size: var(--text-h3); }
+/* About: one company or school per numbered section. Each role's title is a subheading,
+   its dates a label on the right. */
+.entry + .entry { margin-top: var(--space-12); }
+.entry h2 { margin-top: 0; }
+.entry h2 a { text-decoration: none; }
+.role-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--space-4); margin-bottom: var(--space-2); }
+.role-head h3 { margin: 0; font-size: var(--text-base); }
+.role-head .label { white-space: nowrap; }
+.entry .role { margin-top: var(--space-4); }
+.prose strong { color: var(--ink); font-weight: var(--weight-medium); }
+.prose ul { margin: 0 0 var(--space-5); padding-left: var(--space-5); }
+.prose li { margin-bottom: var(--space-2); }
+.prose li::marker { color: var(--ink-soft); }
+.prose :not(pre) > code {
+  white-space: nowrap; padding: 0.1em 0.3em; font: 0.875em var(--font-mono);
+  background: var(--paper-sunk); border: var(--hairline) solid var(--line);
+}
+.prose a code { text-decoration: inherit; }
+
+/* Rules and tables in long notes, drawn like the title block: hairlines and mono headers */
+.prose hr { margin: var(--space-8) 0; border: 0; border-top: var(--hairline) solid var(--line); }
+/* Centred; a table wider than the column fills it and scrolls sideways instead. */
+.prose table { display: block; width: fit-content; max-width: 100%; overflow-x: auto; margin: var(--space-6) auto; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.5; }
+.prose th { font: var(--weight-regular) var(--text-label) / var(--leading-label) var(--font-mono); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--ink-soft); text-align: left; vertical-align: bottom; }
+.prose th, .prose td { padding: var(--space-2) var(--space-4) var(--space-2) 0; border-bottom: var(--hairline) solid var(--line); vertical-align: top; }
+.prose blockquote { margin: 0 0 var(--space-3); padding-left: var(--space-5); border-left: var(--hairline) solid var(--ink); color: var(--ink); }
+.prose blockquote p { margin-bottom: var(--space-3); }
+
+figure { margin: var(--space-8) 0; counter-increment: figure; }
+figure img { display: block; width: 100%; border: var(--hairline) solid var(--line); }
+figcaption { margin-top: var(--space-2); }
+figcaption::before { content: 'Fig. ' counter(figure); margin-right: var(--space-3); }
+
+/* Code blocks: Shiki's css-variables theme (astro.config.mjs) reads these */
+:root {
+  --astro-code-foreground: var(--code-text);
+  --astro-code-background: var(--paper-sunk);
+  --astro-code-token-keyword: var(--code-keyword);
+  --astro-code-token-function: var(--code-text);
+  --astro-code-token-parameter: var(--code-text);
+  --astro-code-token-string: var(--code-string);
+  --astro-code-token-string-expression: var(--code-string);
+  --astro-code-token-link: var(--code-string);
+  --astro-code-token-constant: var(--code-constant);
+  --astro-code-token-punctuation: var(--code-punctuation);
+  --astro-code-token-comment: var(--code-comment);
+}
+pre {
+  margin: var(--space-6) 0; padding: var(--space-4) var(--space-5); overflow-x: auto;
+  border: var(--hairline) solid var(--line);
+  font: var(--text-code) / 1.7 var(--font-mono);
+}
+
+/* Table of contents: a plate under the header; in the left margin, beside the sheet, from 1200px */
+.toc { margin: 0 0 var(--space-8); }
+.toc-inner { padding: var(--space-4) var(--space-5); border: var(--hairline) solid var(--line); }
+.toc ol { margin: var(--space-2) 0 0; padding: 0; list-style: none; counter-reset: toc; }
+.toc li { counter-increment: toc; }
+.toc a { display: flex; gap: var(--space-3); padding: var(--space-1) 0; text-decoration: none; color: var(--ink-soft); font-size: 0.875rem; line-height: 1.45; }
+.toc a::before { content: counter(toc, decimal-leading-zero); font: var(--text-label) / 1.9 var(--font-mono); }
+.toc a:hover, .toc a[aria-current] { color: var(--ink); }
+.toc a[aria-current]::before { color: var(--ink); }
+@media (min-width: 1200px) {
+  .toc { position: absolute; top: 0; bottom: 0; right: calc(100% + var(--space-8)); width: 12rem; margin: 0; }
+  .toc-inner { position: sticky; top: var(--space-8); padding: 0 var(--space-4) 0 0; border: 0; border-right: var(--hairline) solid var(--line); text-align: right; }
+  .toc a { flex-direction: row-reverse; }
+}
+
+/* Replies from Bluesky */
+.replies { margin-top: var(--space-12); padding-top: var(--space-6); border-top: var(--hairline) solid var(--ink); }
+.replies-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4); margin-bottom: var(--space-6); }
+.replies-head h2 { margin: 0; font-size: var(--text-h2); font-weight: var(--weight-medium); letter-spacing: -0.02em; }
+.replies ol { margin: 0; padding: 0; list-style: none; }
+.reply { padding: var(--space-4) 0; border-bottom: var(--hairline) solid var(--grid); }
+.reply .reply { margin-left: var(--space-5); padding-bottom: 0; padding-left: var(--space-4); border-bottom: 0; border-left: var(--hairline) solid var(--line); }
+.reply-author { display: flex; align-items: center; gap: var(--space-3); font-weight: var(--weight-medium); font-size: 0.9375rem; }
+.reply-author .who { min-width: 0; text-decoration: none; }
+.reply-author .handle { font-weight: var(--weight-regular); color: var(--ink-soft); }
+.reply-author time { margin-left: auto; white-space: nowrap; }
+.initials {
+  display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--ink); color: var(--paper); font: var(--weight-medium) 0.6875rem var(--font-mono);
+}
+img.initials { object-fit: cover; }
+.reply-text { margin: var(--space-2) 0 var(--space-2) calc(28px + var(--space-3)); color: var(--prose); }
+.reply-stats { display: flex; gap: var(--space-4); margin-left: calc(28px + var(--space-3)); }
+.replies-cta { display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-6); font-weight: var(--weight-medium); text-decoration: none; }
+.replies-cta:hover .arrow { transform: rotate(-12deg); }

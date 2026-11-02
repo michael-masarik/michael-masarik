@@ -1,0 +1,24 @@
+---
+// Post images, used in MDX as <Image ... />. Drawn in the blue duotone and numbered
+// "Fig. N" in order through the post (CSS counter in site.css).
+export interface Props {
+  /** Served path, e.g. /images/my-post/diagram.png */
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+  /** Set for dark images (terminal or editor screenshots): inverted first, so they read like light code blocks. */
+  dark?: boolean;
+  /** Set for an image near the top of a post: loads right away instead of lazily, so it shows sooner. */
+  eager?: boolean;
+}
+
+import { href } from '../lib/paths';
+
+const { src, alt, width, height, caption, dark = false, eager = false } = Astro.props;
+---
+<figure>
+  <img class:list={['duotone', { 'dark-source': dark }]} src={href(src)} {alt} {width} {height} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
+  <figcaption class="label">{caption}</figcaption>
+</figure>

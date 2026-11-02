@@ -1,0 +1,22 @@
+---
+// Header inside the sheet: the mark (home: the name's first letter and a period, like
+// "a.") and the section nav, marking the current section.
+import { cleanPath, href } from '../lib/paths';
+import { getSections, sectionIndex } from '../lib/sections';
+import { getProfile } from '../lib/profile';
+
+const { name } = await getProfile();
+const mark = `${name[0].toLowerCase()}.`;
+const sections = await getSections();
+const current = sectionIndex(cleanPath(Astro.url.pathname), sections);
+---
+<header class="site-nav">
+  <a class="mark" href={href('/')} aria-label={`${mark} ${name}, home`} aria-current={current === 0 ? 'page' : undefined}>{mark}</a>
+  <nav aria-label="Main">
+    <ul>
+      {sections.slice(1).map(({ href: path, label }, i) => (
+        <li><a href={href(path)} aria-current={current === i + 1 ? 'page' : undefined}>{label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>

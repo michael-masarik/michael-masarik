@@ -1,0 +1,39 @@
+---
+// Replies to a post's Bluesky thread, shown as its comments. The section and the
+// "Reply on Bluesky" link are static; scripts/bluesky-replies.ts fills in the replies
+// after the page loads. If the API fails, the link is still there.
+import Arrow from './Arrow.astro';
+
+export interface Props {
+  /** A bsky.app post URL: https://bsky.app/profile/<handle or did>/post/<rkey> */
+  url: string;
+}
+
+const { url } = Astro.props;
+---
+<section class="replies" aria-labelledby="replies-title" data-bsky={url}>
+  <div class="replies-head">
+    <h2 id="replies-title">Replies</h2>
+    <span class="label" data-status>On Bluesky</span>
+  </div>
+  <ol data-list></ol>
+  <a class="replies-cta" href={url}>Reply on Bluesky <Arrow /></a>
+
+  <!-- One reply; cloned per reply and filled with textContent only (no HTML from the API). -->
+  <template>
+    <li class="reply">
+      <div class="reply-author">
+        <img class="initials duotone" alt="" width="28" height="28" loading="lazy" />
+        <a class="who"><span data-name></span> <span class="handle"></span></a>
+        <time class="label"></time>
+      </div>
+      <p class="reply-text"></p>
+      <div class="reply-stats label"></div>
+      <ol></ol>
+    </li>
+  </template>
+</section>
+
+<script>
+  import '../scripts/bluesky-replies.ts';
+</script>

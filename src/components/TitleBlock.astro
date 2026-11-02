@@ -1,0 +1,86 @@
+---
+// The drawing's information table, used as every page's footer. Sheet and drawing
+// numbers come from the page's section (lib/sections.ts).
+// The Material cell switches the paper: bone, white, or blueprint (see scripts/draft-paper.ts).
+import { cleanPath } from "../lib/paths";
+import { formatRevision } from "../lib/posts";
+import { getProfile } from "../lib/profile";
+import { getSections, SECTIONS, sectionIndex } from "../lib/sections";
+
+export interface Props {
+	/** First line of the wide cell, e.g. the page or post title. */
+	heading: string;
+	/** Second line of the wide cell; defaults to "<section>, <name>", or the name. */
+	subheading?: string;
+	/** The section a page belongs to, shown before the name in the second line. */
+	section?: string;
+	/** Last-changed date; defaults to the build date. */
+	revised?: Date;
+	/** Drawing number after the initials (AE-002); defaults to the section's. Posts pass their own, e.g. W01. */
+	number?: string;
+}
+
+const pad = (n: number) => String(n).padStart(2, "0");
+// "Ada Example" -> "A. Example", as a drawing's "drawn by" initials, and "AE" as the
+// drawing-number prefix.
+const { name } = await getProfile();
+const drawnBy = name.replace(/^(\S)\S*\s+/, "$1. ");
+const initials = name
+	.split(/\s+/)
+	.map((word) => word[0])
+	.join("")
+	.toUpperCase();
+// Numbered within the sections in the nav; a page whose section is hidden (projects,
+// before any is published) falls back to the full list.
+const path = cleanPath(Astro.url.pathname);
+const shown = await getSections();
+const sections = sectionIndex(path, shown) === -1 ? SECTIONS : shown;
+const section = sectionIndex(path, sections) + 1;
+const {
+	heading,
+	section: label,
+	revised = new Date(),
+	number = String(section).padStart(3, "0"),
+} = Astro.props;
+const dwg = `${initials}-${number}`;
+const subheading = Astro.props.subheading ?? (label ? `${label}, ${name}` : name);
+---
+
+<footer class="title-block label">
+    <div class="wide">
+        {heading}
+        <br />
+        <span>{subheading}</span>
+    </div>
+    <div>
+        <span class="k">Drawn</span>
+        {drawnBy}
+    </div>
+    <div>
+        <span class="k">Scale</span>1 : 1
+    </div>
+    <div>
+        <span class="k">Rev</span>
+        {formatRevision(revised)}
+    </div>
+    <div>
+        <span class="k">Sheet</span>
+        {pad(section)} / {pad(sections.length)}
+    </div>
+    <div>
+        <span class="k">Dwg no.</span>
+        {dwg}
+    </div>
+    <div>
+        <span class="k">Units</span>rem
+    </div>
+    <div>
+        <span class="k">Material</span>
+        <button class="paper-toggle" type="button">
+            Astro
+        </button>
+    </div>
+    <div>
+        <span class="k">Checked</span>&mdash;
+    </div>
+</footer>

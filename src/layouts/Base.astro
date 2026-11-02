@@ -1,0 +1,173 @@
+---
+// Page shell for every route: head metadata, the framed sheet (dimension line,
+// registration ticks, nav), and the title-block footer.
+import SiteNav from "../components/SiteNav.astro";
+import TitleBlock, {
+    type Props as TitleBlockProps,
+} from "../components/TitleBlock.astro";
+import { cleanPath, href } from "../lib/paths";
+import { getProfile } from "../lib/profile";
+import "../styles/tokens.css";
+import "../styles/site.css";
+
+export interface Props {
+    /** Page title; the site name is appended unless this is the home page. */
+    title?: string;
+    description?: string;
+    /** Social preview image, a served path like /images/x/cover.png. Defaults to /og.png. */
+    image?: string;
+    /** Footer title-block fields for this page. */
+    block: TitleBlockProps;
+}
+
+const profile = await getProfile();
+const SITE_NAME = profile.name;
+const {
+    title,
+    description = profile.description,
+    image = "/og.png",
+    block,
+} = Astro.props;
+const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+const canonical = new URL(href(cleanPath(Astro.url.pathname)), Astro.site);
+const imageUrl = new URL(href(image), Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{fullTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title={profile.feed.title}
+            href={href("/rss.xml")}
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:title" content={title ?? SITE_NAME} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={imageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <!-- PNG icons for Safari (which handles PNG-in-ICO unreliably) and high-density tabs;
+         the .ico for older browsers; an opaque touch icon for iOS and Safari bookmarks. -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href={href("/icon-32.png")}
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href={href("/icon-192.png")}
+        />
+        <link rel="icon" href={href("/favicon.ico")} sizes="16x16 32x32" />
+        <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+        <link
+            rel="preload"
+            href={href("/fonts/geist-latin-var.woff2")}
+            as="font"
+            type="font/woff2"
+            crossorigin
+        />
+        <!-- Apply the paper before first paint, so it never flashes bone: the visitor's saved
+         choice, else blueprint when the system is in dark mode. -->
+        <script is:inline>
+            document.documentElement.dataset.paper = "blueprint";
+        </script>
+        {/* Vercel Web Analytics and Speed Insights, only when deployed on Vercel. */}
+        {import.meta.env.PROD && process.env.VERCEL && (
+            <>
+                <script
+                    is:inline
+                    defer
+                    src="/_vercel/insights/script.js"
+                ></script>
+                <script
+                    is:inline
+                    defer
+                    src="/_vercel/speed-insights/script.js"
+                ></script>
+            </>
+        )}
+    </head>
+    <body>
+        <a class="skip" href="#main">
+            Skip to content
+        </a>
+
+        <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+            <!-- Duotone filters: shadows map to --ink, highlights to --paper (one per paper). On
+           blueprint the mapping flips: shadows to the blue paper, highlights to white. -->
+            <filter id="duotone" color-interpolation-filters="sRGB">
+                <feColorMatrix
+                    type="matrix"
+                    values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"
+                />
+                <feComponentTransfer>
+                    <feFuncR type="table" tableValues="0.133 0.965" />
+                    <feFuncG type="table" tableValues="0.204 0.957" />
+                    <feFuncB type="table" tableValues="0.659 0.933" />
+                </feComponentTransfer>
+            </filter>
+            <filter id="duotone-white" color-interpolation-filters="sRGB">
+                <feColorMatrix
+                    type="matrix"
+                    values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"
+                />
+                <feComponentTransfer>
+                    <feFuncR type="table" tableValues="0.133 1" />
+                    <feFuncG type="table" tableValues="0.204 1" />
+                    <feFuncB type="table" tableValues="0.659 1" />
+                </feComponentTransfer>
+            </filter>
+            <filter id="duotone-blueprint" color-interpolation-filters="sRGB">
+                <feColorMatrix
+                    type="matrix"
+                    values=".33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 1 0"
+                />
+                <feComponentTransfer>
+                    <feFuncR type="table" tableValues="0.075 0.933" />
+                    <feFuncG type="table" tableValues="0.149 0.945" />
+                    <feFuncB type="table" tableValues="0.353 0.984" />
+                </feComponentTransfer>
+            </filter>
+            <symbol id="arrow" viewBox="0 0 12 12">
+                <path
+                    d="M2.07 11.35.96 10.24 9.2 1.99H2.84l.01-1.54h8.99v9.01h-1.55l.01-6.37z"
+                    fill="currentColor"
+                />
+            </symbol>
+        </svg>
+
+        <div class="sheet-wrap">
+            <div class="dimension label" aria-hidden="true">
+                43.19 rem
+            </div>
+            <div class="sheet">
+                <i class="tick tl"></i>
+                <i class="tick tr"></i>
+                <i class="tick bl"></i>
+                <i class="tick br"></i>
+                <SiteNav />
+                <div class="sheet-body">
+                    <main id="main">
+                        <slot />
+                    </main>
+                    <TitleBlock {...block} />
+                </div>
+            </div>
+        </div>
+
+        <script>
+            import "../scripts/draft-paper.ts";
+        </script>
+    </body>
+</html>

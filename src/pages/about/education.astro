@@ -1,0 +1,28 @@
+---
+// About, education tab: each school with its degree and details, from content/profile.yaml.
+import Base from '../../layouts/Base.astro';
+import Plate from '../../components/Plate.astro';
+import Tabs from '../../components/Tabs.astro';
+import { formatSpan, getProfile } from '../../lib/profile';
+import { ABOUT_TABS } from '../../lib/sections';
+import { inline, plain } from '../../lib/markdown';
+
+const { pages, education } = await getProfile();
+---
+<Base title="Education" description={pages.education && plain(pages.education)} block={{ heading: 'Education', section: 'About' }}>
+  <Tabs label="About" tabs={ABOUT_TABS} />
+  <Plate>
+    <h1 class="page-title">Education</h1>
+    {pages.education && <p class="lede" set:html={inline(pages.education)} />}
+  </Plate>
+
+  <div class="prose">
+    {education.map(({ school, degree, start, end, details }) => (
+      <section class="entry">
+        <h2>{school}</h2>
+        <div class="role-head"><h3>{degree}</h3><span class="label">{formatSpan(start, end)}</span></div>
+        {details.map((text) => <p set:html={inline(text)} />)}
+      </section>
+    ))}
+  </div>
+</Base>

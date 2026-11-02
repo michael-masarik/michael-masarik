@@ -1,0 +1,15 @@
+---
+// A grid-paper panel behind a page header. Hovering fills a grid cell and shows
+// its coordinate in the corner (scripts/draft-paper.ts).
+export interface Props {
+  /** Element to render: `section` on pages, `header` inside an article. */
+  as?: 'section' | 'header';
+}
+
+const { as: Tag = 'section' } = Astro.props;
+---
+<Tag class="plate grid-paper">
+  <span class="plate-coords label" aria-hidden="true">A1</span>
+  <i class="plate-cell" aria-hidden="true"></i>
+  <slot />
+</Tag>

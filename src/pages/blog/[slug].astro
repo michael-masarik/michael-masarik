@@ -1,0 +1,54 @@
+---
+// A post: grid-plate header, table of contents, and the MDX body.
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Plate from '../../components/Plate.astro';
+import Toc from '../../components/Toc.astro';
+import Figure from '../../components/Figure.astro';
+import Replies from '../../components/Replies.astro';
+import { formatDate, getPosts, readingMinutes, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  // Drawing numbers count up from the oldest post: W01, W02, ... (after the initials)
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, number: `W${String(posts.length - i).padStart(2, '0')}` },
+  }));
+}
+
+interface Props {
+  post: Post;
+  number: string;
+}
+
+const { post, number } = Astro.props;
+const { title, summary, publishedAt, updatedAt, showToc, blueskyPostUrl } = post.data;
+const { Content, headings } = await render(post);
+---
+<Base
+  {title}
+  description={summary}
+  image={post.data.image}
+  block={{ heading: title, section: 'Blog', revised: updatedAt ?? publishedAt, number }}
+>
+  <article>
+    <Plate as="header">
+      <h1 class="page-title post-title">{title}</h1>
+      <p class="lede">{summary}</p>
+      <div class="post-meta label">
+        <time datetime={publishedAt.toISOString().slice(0, 10)}>{formatDate(publishedAt)}</time>
+        <span>{readingMinutes(post.body)} min read</span>
+        {post.data.draft && <span>Draft</span>}
+      </div>
+    </Plate>
+
+    {showToc && <Toc {headings} />}
+
+    <div class="prose">
+      <Content components={{ Image: Figure }} />
+    </div>
+
+    {blueskyPostUrl && <Replies url={blueskyPostUrl} />}
+  </article>
+</Base>

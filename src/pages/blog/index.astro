@@ -1,0 +1,36 @@
+---
+// Blog: every published post, grouped by year, newest first.
+import Base from '../../layouts/Base.astro';
+import Plate from '../../components/Plate.astro';
+import Arrow from '../../components/Arrow.astro';
+import { formatDay, getPosts } from '../../lib/posts';
+import { getProfile } from '../../lib/profile';
+import { inline, plain } from '../../lib/markdown';
+import { href } from '../../lib/paths';
+
+const { pages } = await getProfile();
+const posts = await getPosts();
+const years = Object.entries(Object.groupBy(posts, ({ data }) => data.publishedAt.getUTCFullYear())).reverse();
+---
+<Base title="Blog" description={plain(pages.blog)} block={{ heading: 'Blog' }}>
+  <Plate>
+    <h1 class="page-title">Blog</h1>
+    <p class="lede" set:html={inline(pages.blog)} />
+  </Plate>
+
+  {years.map(([year, yearPosts]) => (
+    <section aria-labelledby={`y${year}`}>
+      <h2 class="year label" id={`y${year}`}>{year}</h2>
+      {yearPosts!.map(({ id, data }) => (
+        <a class="card" href={href(`/blog/${id}`)}>
+          <span class="card-left">
+            <time class="label" datetime={data.publishedAt.toISOString().slice(0, 10)}>{formatDay(data.publishedAt)}</time>
+            {data.title}
+            {data.draft && <span class="label">Draft</span>}
+          </span>
+          <Arrow />
+        </a>
+      ))}
+    </section>
+  ))}
+</Base>

@@ -1,0 +1,23 @@
+# dependencies
+/node_modules
+
+# build output and Astro's generated types
+/dist
+/.astro
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# misc
+.DS_Store
+.vscode
+*.pem
+
+# scratch
+/scratch
+
+# claude skills (local symlink)
+/.claude/skills

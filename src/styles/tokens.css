@@ -1,0 +1,136 @@
+/*
+  Design tokens: Draft Paper, by Flavia Ouyang (https://www.flaviaouyang.com).
+  Contrast ratios are WCAG 2.x, measured against --paper unless noted.
+*/
+
+/* Fonts: Latin subset, woff2. Total 65 KB (budget 150 KB). */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin-var.woff2') format('woff2');
+  font-weight: 100 900; /* variable, 29 KB */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-latin-400-italic.woff2') format('woff2');
+  font-weight: 400; /* static, 13 KB */
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/geist-mono-latin-var.woff2') format('woff2');
+  font-weight: 100 900; /* variable, 23 KB */
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Color */
+  --paper: #f6f4ee; /* bone */
+  --paper-sunk: #eef0f7; /* code blocks; 1.04:1, separated by --line border */
+  --ink: #2234a8; /* drafting blue: body, headings, rules, links. 8.99:1 */
+  --ink-soft: #5a64b0; /* secondary text and mono labels only. 4.92:1 */
+  --line: #c9cde6; /* hairlines, card borders, grid major. Decorative, 1.43:1 */
+  --grid: #e3e4ef; /* grid minor */
+  --prose: color-mix(in srgb, var(--ink) 88%, var(--paper)); /* body copy, slightly lifted off headings */
+
+  /* Duotone (SVG filter #duotone maps shadows to --ink, highlights to --paper):
+     R 0.133 to 0.965, G 0.204 to 0.957, B 0.659 to 0.933 */
+
+  /* Syntax, measured against --paper-sunk. Shiki emits these through its
+     css-variables theme; site.css maps them to its --astro-code-* names. */
+  --code-text: #14206e; /* 12.62:1, identifiers and function names */
+  --code-keyword: #2234a8; /* 8.68:1 */
+  --code-string: #0b5f73; /* 6.36:1 */
+  --code-constant: #6a3aa0; /* 6.77:1, numbers, properties */
+  --code-punctuation: #4a5394; /* 6.24:1 */
+  --code-comment: #5f6698; /* 4.80:1 */
+
+  /* Type families. CJK falls back to system faces. */
+  --font-sans: 'Geist', system-ui, -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Type scale */
+  --text-label-xs: 0.5625rem; /* 9px, title-block keys, mono caps */
+  --text-label: 0.6875rem; /* 11px, mono caps labels, dates, captions */
+  --text-sm: 0.75rem; /* pills */
+  --text-code: 0.875rem;
+  --text-nav: 0.9375rem;
+  --text-base: 1rem; /* body, cards */
+  --text-lede: 1.0625rem;
+  --text-h3: 1.0625rem;
+  --text-h2: 1.25rem;
+  --text-h1: 1.75rem; /* page title */
+  --text-title: clamp(1.75rem, 5vw, 2.5rem); /* post title */
+  --weight-regular: 400;
+  --weight-medium: 500; /* headings, nav, cards, keywords */
+  --leading-body: 1.75;
+  --leading-title: 1.2;
+  --leading-label: 1.35;
+  --tracking-title: -0.03em;
+  --tracking-label: 0.04em; /* with text-transform: uppercase */
+
+  /* Spacing: 4px base */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 1.75rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Drawing */
+  --cell: 16px; /* grid minor; major is 5 cells */
+  --hairline: 1px;
+  --tick: 15px; /* registration mark at frame corners; odd so the arms centre on a 1px hairline */
+
+  /* Layout */
+  --sheet: 44rem; /* maximum sheet width; site.css snaps it down to the grid (43.19rem) */
+  --gutter: 1rem; /* page edge to sheet, phone and up */
+  --sheet-pad: 1.5rem; /* inside the frame; --space-8 from 640px */
+  --radius-pill: 999px;
+}
+
+/*
+  Papers, chosen in the title block's Material cell (scripts/draft-paper.ts). Bone is the
+  default; blueprint is the dark theme and follows the system's dark mode until a visitor
+  picks a paper.
+*/
+
+/* White: ink 9.88:1, ink-soft 5.41:1. */
+:root[data-paper='white'] {
+  --paper: #ffffff;
+}
+
+/* Blueprint: white lines on cyanotype blue. Contrast on --paper unless noted. */
+:root[data-paper='blueprint'] {
+  color-scheme: dark;
+  --paper: #13265a;
+  --paper-sunk: #0f1f4b;
+  --ink: #eef1fb; /* 12.81:1 */
+  --ink-soft: #9fb0dc; /* 6.69:1 */
+  --line: #3d5596; /* decorative */
+  --grid: #22397a;
+  --prose: #d3daf0; /* 10.37:1 */
+  /* Syntax, against --paper-sunk */
+  --code-text: #e6ebfa; /* 13.38:1 */
+  --code-keyword: #ffffff; /* 15.93:1 */
+  --code-string: #8fe0d0; /* 10.43:1 */
+  --code-constant: #d6b8ff; /* 9.23:1 */
+  --code-punctuation: #aab8e0; /* 8.07:1 */
+  --code-comment: #8fa0cf; /* 6.14:1 */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --sheet-pad: 2rem;
+  }
+}

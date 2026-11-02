@@ -1,0 +1,103 @@
+---
+title: AI as Guardrails
+publishedAt: 2026-11-01
+summary: I love using AI, just not for writing code. As an auditor, I am happy to have it collaborating with me
+---
+
+> I use AI not to write my code, but to catch my mistakes in a formalized way
+
+I like AI just fine. It taught me how to code and I fall back to it whenever I have a question that Google or my collection of physics textbooks can't resolve. But I do not trust it to write my code for me. Maybe it is just that I have always used the free plan for everything so my results where always the bottom of the barrel, or maybe it is just that I am not good at prompting agents. Either way, every time I trust a project to an agent, I end up scrapping the project and starting from scratch later when I add a new feature. Even the agents can't make sense of the code they wrote.
+
+I think the general issue is that as humans we have perspective that the AI will never have: past experiences with bad UI, the actual people who will use it, code layout preferences, etc. We know what features we may want down the road. The AI does not. For me, it always ended up locking the code into a few monolithic files (even when I expressly instructed it not to) that hardcode arbitrary values all over the place. Untagling the import soup later is no easy task for neither the human nor the bot.
+
+## AI as an auditor, not a coder
+
+As such, I had no real use for AI in my codebase. I would ask Claude questions, have Notion AI compare my database schema to the recent meeting notes, and maybe have the Github Copilot CLI check out some error logs. But that would be about it. That is until I was working on a bigger project (written in Go) and I needed a hand making sure I was consistant with my error handling. On a whim, I installed OpenCode and had `Big Pickle` generate the following:
+
+```markdown
+# AGENTS.md
+
+## Mode: advisor and auditor (read-only by default)
+
+This repository is worked on in **advisor-only mode**. Your job is to answer
+questions and audit the codebase. You are not an implementer unless the user
+explicitly asks you to change something in the current message.
+
+### Hard rules
+
+- **Do not modify files by default.** No `write`, `edit`, `patch`, formatters,
+  or code generation unless the user explicitly requests a change in the
+  current message. "Fix it", "apply that", or "make the change" counts;
+  "what do you think?" or "review this" does not.
+- **Do not run mutating commands by default.** `go build`, `go vet`,
+  `go test`, `git status`, `git diff`, `git log`, `rg`, and reading files are
+  fine. Do not run `git commit`, `git push`, `git checkout`, `rm`, package
+  installs, migrations, `make sql`, or anything that writes to disk or the
+  network without explicit permission.
+- **Read-only is not a suggestion.** When in doubt, report the issue and
+  propose a patch in your reply instead of applying it.
+- **Never commit, push, or open PRs** unless explicitly asked.
+- **Never print secrets.** If you encounter credentials, `.env` values, tokens,
+  or keys, redact them in your output and flag their location.
+- **Do not weaken safety checks** (auth, validation, permissions) as a
+  "fix" without calling it out and getting confirmation.
+- If a request requires a write and permission was not clearly given, ask one
+  short clarifying question rather than proceeding.
+
+## What to do
+
+1. **Answer queries** about how the code works, where something lives, why a
+   design choice was made, or what a dependency does.
+2. **Audit for bugs**: logic errors, nil/zero-value handling, wrong error
+   returns, ignored errors, off-by-one, broken queries, race conditions,
+   resource leaks, incorrect SQL/schema assumptions.
+3. **Audit for typos**: identifiers, comments, user-facing strings, docs,
+   error messages. Report them, don't silently rewrite.
+4. **Audit for security vulnerabilities**: injection (SQL/shell/path),
+   unsafe deserialization, SSRF, missing input validation, auth/authz gaps,
+   secret handling, unsafe defaults, dependency risk, XSS in the frontend.
+5. When useful, **suggest** a minimal patch or test in the chat, clearly
+   labeled as a proposal.
+
+## Reporting format
+
+For each finding, give:
+
+- **Severity**: critical / high / medium / low / nit
+- **Location**: `path:line`
+- **Problem**: what is wrong and why it matters
+- **Evidence**: the relevant snippet or reasoning
+- **Suggested fix**: minimal diff or description (do not apply it)
+
+Group findings by severity, most serious first. Separate confirmed bugs from
+speculative concerns. If you find nothing in a category, say so explicitly.
+
+## Project context
+
+...
+```
+
+And then I had it write this OpenCode config:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    { "action": "read", "resource": "*", "effect": "allow" },
+    { "action": "glob", "resource": "*", "effect": "allow" },
+    { "action": "grep", "resource": "*", "effect": "allow" },
+    { "action": "edit", "resource": "*", "effect": "ask" },
+    { "action": "shell", "resource": "*", "effect": "ask" }
+  ]
+}
+```
+
+First time I tried it, it came back with this in-depth, detailed, orginized list of all the bugs and typoes in my code (14 total across about 10 files). It caught everything from english typoes ("rror" instead of error), to inconsistant error messages, to DDoS vulnerabilities. It was almost exactly what I needed. It still needs some tweaking - the ordering and grouping could use some work - but over all it was a nice addition to my toolbelt. I am not going to run it before every commit, but I think when ever I make a big-ish change, I will have it take a quick scan from now on.
+
+## What to do with the data dump
+
+The audit was amazing... except for one issue. There was no easy way to use the info from the audit! I could read down the list, fix the bugs it noticed, and then move to the next item, but what happens when something isn't a one-line fix? Restructing a 400-line go package so that each method uses context passed in the args instead of on the struct is not a quick fix. All callers now need to be updated and then you need to test (and then audit) everything again. My solution was to have the AI pipe everything into a `TODO.md` file that I can annotate as I fix or ignore issues.
+
+The `TODO.md` file is not a perfect solution, though. It is too free-form and messy for my tastes. For now it is working, though I think I might try integrating Notion. It would be really nice to have everything be in a database with status properties and other context, and it would not make me sad if Notion AI could get a sense of what is going on in between commits.
+
+All-in-all, it is nice to have an LLM looking over my shoulder and checking my work. I am still going to write every line, but to have a second pair of eyes catching will, I think, save me stress and debugging time down the the road.

@@ -1,0 +1,22 @@
+---
+// Table of contents for a post: its h2s as plain anchor links. Sits under the header,
+// and in the margin beside the sheet from 1200px (site.css). With JS, the section
+// being read is marked (scripts/draft-paper.ts).
+import type { MarkdownHeading } from 'astro';
+
+export interface Props {
+  headings: MarkdownHeading[];
+}
+
+const sections = Astro.props.headings.filter(({ depth }) => depth === 2);
+---
+{sections.length > 0 && (
+  <nav class="toc" aria-labelledby="toc-title">
+    <div class="toc-inner">
+      <span class="label" id="toc-title">Contents</span>
+      <ol>
+        {sections.map(({ slug, text }) => <li><a href={`#${slug}`}>{text}</a></li>)}
+      </ol>
+    </div>
+  </nav>
+)}

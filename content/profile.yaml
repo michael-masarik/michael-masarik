@@ -1,0 +1,62 @@
+# Everything about you: Home, About, and each page's opening line come from here.
+# Replace Ada Example with yourself. The build checks every field and names any mistake.
+#
+# Text fields accept inline Markdown: [link](url), **bold**, *italic*, `code`.
+# Dates are YYYY or YYYY-MM; leave out `end` for something current.
+# Add `hidden: true` to any experience or education entry to leave it out.
+
+name: Michael Masarik
+# One line under your name on Home.
+tagline: Philosophy-loving software engineer building tools for libraries
+# Shown in Home's title block.
+location: Anywhere, Earth
+# The site's search and social-preview description, for pages without their own.
+description: Michael Masaril, Philosophy-loving software engineer building tools for libraries.
+# Your blog's RSS feed.
+feed:
+  title: Michael Masarik
+  description: Random thoughts on software, philosophy, and physics
+
+# A square image for the GitHub card on Home (optional). Put it in public/images/.
+avatar: /images/avatar.png
+links:
+  email: masarikfamilymichael@gmail.com
+  github: https://github.com/michael-masarik
+# How Home's contact links read.
+contact:
+  email: email me
+
+home:
+  # Paragraphs before the GitHub card.
+  intro:
+    - "**Greetings!** I'm Michael Masarik, a software engineer based in the rolling hills and farmland of NE Wisconsin. My love of software development grew out of a love of pure logic. I was homeschooled, and one of my favorite classes in highschool was formal logic. I bring that precise thinking to all the code that I write"
+    - 'In my family, we didn''t use technology all that heavily. That is, until a few years ago. We weren''t against it, just didn''t use it. In 2021, we opened [Plumfield Library](https://plumfieldlibrary.com) and quickly discovered that the tech that we needed was far too expensive for a "non-profitable" library like ours. I tried my hand at a little code and quickly realized that I really enjoyed it.'
+    - "With the help of AI, I taught myself any language that I need to accomplish a given task. Nowadays, I mostly use TypeScript and Go, with some Python (it is a great langauage, just a bit too slow and memory-heavy for my tastes). For frontend work I tend to stick with Vite and/or Astro."
+  # The paragraph before your three newest posts.
+  writing: I write now and then, mostly about software. The rest is on [my blog](/blog).
+  # Paragraphs after the posts.
+
+# Each page's opening line, under its title. Also used as the page's search description.
+pages:
+  about: Building small, careful tools.
+  education: Where I learned.
+  projects: Things I've built.
+  blog: Notes on software and the things around it.
+  now: What I'm up to these days.
+
+experience:
+  # A job with one role: its title and dates directly.
+  - org: Plumfield Library
+    summary: A private lending library serving the population of the Green Bay area
+    title: Full-Stack Engineer and IT Systems Admin
+    start: 2021-05
+    highlights:
+      - Built entire patron and handicraft classes management system, dynamic patron portal, and private MacOS apps.
+      - Currently working on a unified patron, class, calendar, and catalog system
+
+education:
+  - school: NWTC
+    degree: Associate's Degree in IT Systems Administration
+    start: 2026
+    details:
+      - "Still in progress"

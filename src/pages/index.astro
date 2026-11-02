@@ -1,0 +1,53 @@
+---
+// Home. All copy comes from content/profile.yaml; the post list shows the latest
+// posts from content/posts/ (the rest are on /blog).
+import Base from '../layouts/Base.astro';
+import Plate from '../components/Plate.astro';
+import Arrow from '../components/Arrow.astro';
+import { getPosts } from '../lib/posts';
+import { getProfile } from '../lib/profile';
+import { inline } from '../lib/markdown';
+import { href } from '../lib/paths';
+
+const { name, tagline, location, avatar, links, contact, home } = await getProfile();
+const LATEST_POSTS = 3;
+const posts = (await getPosts()).slice(0, LATEST_POSTS);
+const github = new URL(links.github).pathname.slice(1);
+---
+<Base block={{ heading: name, subheading: location }}>
+  <Plate>
+    <h1 class="page-title">{name}</h1>
+    <p class="lede" set:html={inline(tagline)} />
+  </Plate>
+
+  <div class="prose">{home.intro.map((text) => <p set:html={inline(text)} />)}</div>
+
+  <div class="cards">
+    <a class="card" href={links.github}>
+      <span class="card-left">{avatar && <img class="avatar duotone" src={href(avatar)} width="56" height="56" alt="" />}@{github}</span>
+      <Arrow />
+    </a>
+  </div>
+
+  <div class="prose"><p set:html={inline(home.writing)} /></div>
+
+  <div class="cards">
+    {posts.map(({ id, data }, i) => (
+      <a class="card" href={href(`/blog/${id}`)}>
+        <span class="card-left">
+          <span class="balloon" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          {data.title}
+          {data.draft && <span class="label">Draft</span>}
+        </span>
+        <Arrow />
+      </a>
+    ))}
+  </div>
+
+  <div class="prose">{home.closing.map((text) => <p set:html={inline(text)} />)}</div>
+
+  <ul class="contact">
+    <li><a href={`mailto:${links.email}`}><Arrow />{contact.email}</a></li>
+    {links.linkedin && <li><a href={links.linkedin}><Arrow />{contact.linkedin ?? 'LinkedIn'}</a></li>}
+  </ul>
+</Base>
