@@ -31,7 +31,7 @@ home:
   intro:
     - "**Greetings!** I'm Michael Masarik, a software engineer based in the rolling hills and farmland of NE Wisconsin. My love of software development grew out of a love of pure logic. I was homeschooled, and one of my favorite classes in highschool was formal logic. I bring that precise thinking to all the code that I write"
     - 'In my family, we didn''t use technology all that heavily. That is, until a few years ago. We weren''t against it, just didn''t use it. In 2021, we opened [Plumfield Library](https://plumfieldlibrary.com) and quickly discovered that the tech that we needed was far too expensive for a "non-profitable" library like ours. I tried my hand at a little code and quickly realized that I really enjoyed it.'
-    - "With the help of AI, I taught myself any language that I need to accomplish a given task. Nowadays, I mostly use TypeScript and Go, with some Python (it is a great langauage, just a bit too slow and memory-heavy for my tastes). For frontend work I tend to stick with Vite and/or Astro."
+    - "With the help of AI, I taught myself any language that I needed to accomplish a given task. Nowadays, I mostly use TypeScript and Go, with some Python (it is a great langauage, just a bit too slow and memory-heavy for my tastes). For frontend work I tend to stick with Vite and/or Astro."
   # The paragraph before your three newest posts.
   writing: I write now and then, mostly about software. The rest is on [my blog](/blog).
   # Paragraphs after the posts.
